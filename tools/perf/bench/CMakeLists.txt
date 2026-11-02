@@ -4,6 +4,8 @@ set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
 set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
 set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
 set(BENCHMARK_ENABLE_WERROR OFF CACHE BOOL "" FORCE)
+# benchmark 1.9.1 builds itself with -pedantic-errors, and newer Clang calls __COUNTER__ an extension
+add_compile_options(-Wno-unknown-warning-option -Wno-c2y-extensions)
 FetchContent_Declare(benchmark GIT_REPOSITORY https://github.com/google/benchmark.git GIT_TAG v1.9.1 GIT_SHALLOW TRUE)
 FetchContent_MakeAvailable(benchmark)
 
