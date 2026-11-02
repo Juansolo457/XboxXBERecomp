@@ -39,3 +39,4 @@ if(WIN32)
 endif()
 
 add_subdirectory(recomp)
+add_subdirectory(runtime)

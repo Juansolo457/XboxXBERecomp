@@ -28,6 +28,14 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y clang ninja-build
 
+      # Windows has fxc and dxc in its SDK
+      - name: Fetch dxc
+        if: runner.os == 'Linux'
+        run: |
+          mkdir -p "$RUNNER_TEMP/dxc"
+          curl -sSfL https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.9.2609/linux_dxc_2026_09_28.x86_x64.tar.gz | tar xz -C "$RUNNER_TEMP/dxc"
+          echo "$RUNNER_TEMP/dxc/bin" >> "$GITHUB_PATH"
+
       - name: Configure
         run: cmake -S tests -B out/tests -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 
@@ -43,5 +51,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: generated-${{ matrix.os }}
-          path: out/tests/recomp/*/generated/
+          path: |
+            out/tests/recomp/*/generated/
+            out/tests/runtime/shaders/*.hlsl
           if-no-files-found: ignore

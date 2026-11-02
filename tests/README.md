@@ -31,6 +31,24 @@ tests run:
 To add a case: a function in `cases.py` with the `@case()` decorator, its checks in `cases/<name>.cpp`, then the golden
 files as above. `t.fn("name")` declares a function the checks call as `FN_name`; any label is `VA_name`.
 
+## Runtime: `runtime/`
+
+`runtime_tests` links the kernel, DirectSound and vertex sources as a game does, leaving out the window, GPU backend,
+audio output and `kernel/boot.cpp`, on the real 4 GB guest address space:
+
+- `test_objects.cpp` waits and wake ups: which waits sit on which objects, one release per set, timeouts, mutants across
+  threads, guest dispatcher headers, timers, APCs and DPCs
+- `test_memory.cpp` the virtual, contiguous, system and stack allocators, and the physical memory's two windows
+- `test_files.cpp` `NtQueryDirectoryFile` masks and renames, through the exports with the guest's calling convention
+- `test_dsound.cpp` is `xdk/dsound.cpp`'s translation unit, to reach its private decoder and cursors: ADPCM against hand
+  worked values and the format's encoder, the play cursor against a frame by frame model
+- `test_vertex.cpp` each vertex type's conversion and each primitive's index list
+
+`shader_corpus` runs the shader translator on inputs written out in `shader_corpus.cpp`, none from a game.
+`shader_corpus_golden` compares its HLSL with `golden/`, `check_shaders.py golden <out> tests/runtime/golden --update`
+accepts a change. `shader_corpus_compile` puts every file through each compiler it finds: fxc at the renderer's profiles,
+dxc at shader model 6. The HLSL is checked to compile, not run. With neither compiler the test reports as skipped.
+
 ## Known bugs
 
 A test marked `doctest::should_fail()` states the right behaviour of something the SDK gets wrong today. The suite stays
