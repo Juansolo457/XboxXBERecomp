@@ -571,10 +571,24 @@ KERNEL_EXPORT(226, NtSetInformationFile, 5) {
             std::string target = ReadAnsiString(in + 8);
             std::string host = ResolvePath(target, root);
             if (host.empty()) return kObjectPathNotFound;
-            if (f->fp) std::fflush(f->fp);
+            if (!G<uint8_t>(in) && fs::exists(host, ec)) return kObjectNameCollision;
+            // Windows renames no file a handle holds open without delete sharing, which fopen's are: this one's
+            // stream is closed for the rename and reopened on the new name (its position is kept in pos)
+            std::lock_guard<std::mutex> lock(f->io);
+            if (f->fp) {
+                std::fclose(f->fp);
+                f->fp = nullptr;
+            }
             fs::rename(f->host, host, ec);
+            if (ec) LOGW("NtSetInformationFile: cannot rename %s to %s (%s)", f->host.string().c_str(), host.c_str(),
+                         ec.message().c_str());
+            else
+                f->host = host;
+            if (!f->dir) {
+                f->fp = std::fopen(f->host.string().c_str(), "r+b");
+                if (!f->fp) f->fp = std::fopen(f->host.string().c_str(), "rb");
+            }
             if (ec) return kAccessDenied;
-            f->host = host;
             break;
         }
         case 4:  // basic, times and attributes are not kept
@@ -632,7 +646,9 @@ KERNEL_EXPORT(207, NtQueryDirectoryFile, 10) {
         LOG_FIRST(8, "NtQueryDirectoryFile: class %u", cls);
         return kInvalidParameter;
     }
-    std::string pat = mask ? ReadAnsiString(mask) : "*";
+    // an empty mask matches everything, as no mask does: XAPI's FindFirstFile passes one for "*.*"
+    std::string pat = mask ? ReadAnsiString(mask) : "";
+    if (pat.empty()) pat = "*";
     if (!f->listed || (restart & 0xFF)) {
         f->entries.clear();
         f->disc_entries.clear();

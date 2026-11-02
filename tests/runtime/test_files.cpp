@@ -2,6 +2,7 @@
 #include <cctype>
 #include <filesystem>
 #include <fstream>
+#include <iterator>
 #include <memory>
 #include <random>
 #include <string>
@@ -106,9 +107,8 @@ TEST_CASE("NtQueryDirectoryFile masks") {
     CHECK(c.List(AnsiString("nothing*")).empty());
 }
 
-// SDK bug at f7b13fd: XAPI's FindFirstFile passes an empty mask for "*.*", which the host matches against nothing, so
-// the title finds no files. should_fail keeps the suite green and fails it when the bug is fixed.
-TEST_CASE("an empty mask lists everything, as no mask does" * doctest::should_fail()) {
+// XAPI's FindFirstFile passes an empty mask for "*.*"
+TEST_CASE("an empty mask lists everything, as no mask does") {
     GetMounts();
     Call c;
     CHECK(c.List(AnsiString("")) == kAll);
@@ -149,10 +149,13 @@ TEST_CASE("a bad handle is refused") {
 
 namespace {
 
-// a file on the first hard disk partition, renamed through its open handle
-uint32_t Rename(Call& c, const std::string& from, const std::string& to, uint8_t replace) {
-    uint32_t file = c.Open("\\Device\\Harddisk0\\Partition1\\" + from, 0);
-    uint32_t in = mem::AllocSystem(16 + uint32_t(to.size()) + 40);
+constexpr uint32_t kNtReadFile = 219;
+
+uint32_t OpenOnDisk(Call& c, const std::string& name) { return c.Open("\\Device\\Harddisk0\\Partition1\\" + name, 0); }
+
+// FILE_RENAME_INFORMATION through the open handle, to a name on the same partition
+uint32_t RenameOpen(Call& c, uint32_t file, const std::string& to, uint8_t replace) {
+    uint32_t in = mem::AllocSystem(16);
     std::string target = "\\Device\\Harddisk0\\Partition1\\" + to;
     kernel::G<uint8_t>(in) = replace;
     kernel::W32(in + 4, 0);
@@ -161,21 +164,24 @@ uint32_t Rename(Call& c, const std::string& from, const std::string& to, uint8_t
     uint32_t text = mem::AllocSystem(uint32_t(target.size()) + 1);
     kernel::W32(in + 12, text);
     std::memcpy(kernel::HostPtr(text), target.data(), target.size());
-    uint32_t r = test::KernelCall(c.ctx, kNtSetInformationFile, {file, c.iosb, in, 16, kFileRenameInformation});
+    return test::KernelCall(c.ctx, kNtSetInformationFile, {file, c.iosb, in, 16, kFileRenameInformation});
+}
+
+uint32_t Rename(Call& c, const std::string& from, const std::string& to, uint8_t replace) {
+    uint32_t file = OpenOnDisk(c, from);
+    uint32_t r = RenameOpen(c, file, to, replace);
     kernel::CloseHandle(file);
     return r;
 }
 
+std::string Contents(const fs::path& path) {
+    std::ifstream f(path, std::ios::binary);
+    return std::string(std::istreambuf_iterator<char>(f), {});
+}
+
 }  // namespace
 
-// SDK bug at f7b13fd, on Windows only: the handle's stream stays open across the rename and fopen's streams do not share
-// delete, so a title's rename fails with access denied.
-#ifdef _WIN32
-#define XBE_WINDOWS_RENAME_BUG * doctest::should_fail()
-#else
-#define XBE_WINDOWS_RENAME_BUG
-#endif
-TEST_CASE("a file renames through its open handle" XBE_WINDOWS_RENAME_BUG) {
+TEST_CASE("a file renames through its open handle") {
     Mounts& m = GetMounts();
     Call c;
     fs::path disk = m.data / "E";
@@ -185,8 +191,20 @@ TEST_CASE("a file renames through its open handle" XBE_WINDOWS_RENAME_BUG) {
     CHECK_FALSE(fs::exists(disk / "old.dat"));
 }
 
-// SDK bug at f7b13fd: ReplaceIfExists is ignored, a rename onto an existing file replaces it.
-TEST_CASE("a rename onto an existing file without ReplaceIfExists is a collision" * doctest::should_fail()) {
+TEST_CASE("a handle reads on from its position after a rename") {
+    Mounts& m = GetMounts();
+    Call c;
+    std::ofstream(m.data / "E" / "reading.dat") << "hello";
+    uint32_t file = OpenOnDisk(c, "reading.dat");
+    uint32_t buffer = mem::AllocSystem(16);
+    REQUIRE(test::KernelCall(c.ctx, kNtReadFile, {file, 0, 0, 0, c.iosb, buffer, 2, 0}) == kernel::kSuccess);
+    REQUIRE(RenameOpen(c, file, "read_on.dat", 1) == kernel::kSuccess);
+    REQUIRE(test::KernelCall(c.ctx, kNtReadFile, {file, 0, 0, 0, c.iosb, buffer + 2, 3, 0}) == kernel::kSuccess);
+    CHECK(std::string(static_cast<const char*>(kernel::HostPtr(buffer)), 5) == "hello");
+    kernel::CloseHandle(file);
+}
+
+TEST_CASE("a rename onto an existing file without ReplaceIfExists is a collision") {
     Mounts& m = GetMounts();
     Call c;
     fs::path disk = m.data / "E";
@@ -194,6 +212,18 @@ TEST_CASE("a rename onto an existing file without ReplaceIfExists is a collision
     std::ofstream(disk / "second.dat") << "second";
     CHECK(Rename(c, "first.dat", "second.dat", 0) == kernel::kObjectNameCollision);
     CHECK(fs::exists(disk / "first.dat"));
+    CHECK(Contents(disk / "second.dat") == "second");
+}
+
+TEST_CASE("ReplaceIfExists replaces the file") {
+    Mounts& m = GetMounts();
+    Call c;
+    fs::path disk = m.data / "E";
+    std::ofstream(disk / "third.dat") << "third";
+    std::ofstream(disk / "fourth.dat") << "fourth";
+    CHECK(Rename(c, "third.dat", "fourth.dat", 1) == kernel::kSuccess);
+    CHECK_FALSE(fs::exists(disk / "third.dat"));
+    CHECK(Contents(disk / "fourth.dat") == "third");
 }
 
 TEST_CASE("opening what does not exist") {

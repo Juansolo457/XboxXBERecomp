@@ -5,9 +5,9 @@ X86_FUNC(__imp__sub_00011000) {
 	uint32_t ca = 0, cb = 0;
 	(void)ca; (void)cb;
 	// 00011000 push ds
-	{ uint16_t v = (uint16_t)(0u); ctx.esp -= 2; X86_MEM16(ctx.esp) = v; }
+	{ uint32_t v = (uint32_t)(0u); X86_PUSH32(v); }
 	// 00011001 push es
-	{ uint16_t v = (uint16_t)(0u); ctx.esp -= 2; X86_MEM16(ctx.esp) = v; }
+	{ uint32_t v = (uint32_t)(0u); X86_PUSH32(v); }
 	// 00011002 pop es
 	ctx.esp += 4;
 	// 00011003 pop ds
@@ -24,7 +24,7 @@ X86_FUNC(__imp__sub_00011005) {
 	// 00011005 mov eax, esp
 	{ ctx.eax = (uint32_t)(ctx.esp); }
 	// 00011007 push ds
-	{ uint16_t v = (uint16_t)(0u); ctx.esp -= 2; X86_MEM16(ctx.esp) = v; }
+	{ uint32_t v = (uint32_t)(0u); X86_PUSH32(v); }
 	// 00011008 sub eax, esp
 	{ uint32_t a = (uint32_t)(ctx.eax); uint32_t b = (uint32_t)(ctx.esp); uint32_t r = (uint32_t)(a - b); ctx.eax = (uint32_t)(r); cf = a < b; of = (uint32_t)(((a ^ b) & (a ^ r)) >> 31) & 1; zf = r == 0; sf = (uint32_t)(r >> 31) & 1; pf = X86_PARITY(r); }
 	// 0001100A pop ds

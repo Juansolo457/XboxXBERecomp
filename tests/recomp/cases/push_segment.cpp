@@ -1,15 +1,13 @@
 #include "guest.h"
 
-// SDK bug at f7b13fd: push ds and push es move esp by 2 while pop moves it by 4, because Zydis gives a segment operand
-// 16 bits. Bink's CPU check pushes both. should_fail keeps the suite green and fails it when the bug is fixed, at which
-// point the decorators come off.
-TEST_CASE("a segment push takes a four byte slot" * doctest::should_fail()) {
+// Zydis gives a segment operand 16 bits, but its push moves esp by 4 as its pop does. Bink's CPU check pushes both.
+TEST_CASE("a segment push takes a four byte slot") {
     Guest g;
     g.CallUnchecked(FN_slot_size);
     CHECK(g.ctx.eax == 4);
 }
 
-TEST_CASE("segment pushes and pops balance" * doctest::should_fail()) {
+TEST_CASE("segment pushes and pops balance") {
     Guest g;
     g.Call(FN_balance);
 }
