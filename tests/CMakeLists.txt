@@ -40,3 +40,6 @@ endif()
 
 add_subdirectory(recomp)
 add_subdirectory(runtime)
+
+add_subdirectory(${XBE_SDK_DIR}/tools/perf/bench perf_bench)
+add_test(NAME perf_tools COMMAND ${Python3_EXECUTABLE} ${XBE_SDK_DIR}/tools/perf/test_perf_tools.py)

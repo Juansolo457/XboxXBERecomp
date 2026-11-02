@@ -1,0 +1,9 @@
+[    0.012] Sample Title (default.xbe), 2026-11-01 12:00:00
+[    0.013] CPU: Test CPU 4000 (16 threads)
+[    0.100] D3D12 adapter: Test GPU 100
+[    1.001] perf: 120.0 fps 8.33 ms/frame | host 2.50 (draw 1.00: assemble 0.50 bind 0.25 [check 0.10, upload 0.05] compile 0.00; clear 0.10 copy 0.10 sync 0.20 present 1.00 [swap 0.80 wait 0.10]) other 5.83
+[    1.001] perf: title thread per frame: recording 1.50 ms, waiting 3.00 ms (1.5 waits: read-back 0.10 resource 0.00 fence 0.10 flush 0.00 copy 0.00, next frame 2.80) | read-backs waited for: 0.2 lock, 0.0 NOOVERWRITE
+[    1.001] perf: per frame 100 draws (100 raw) 25k verts 0.5 MB upload 0.0 overflow | 100 checks 0.10 MB hashed | 0.1 tex uploads 0.05 MB, 0.0 new tex, 0.0 new targets, 0.0 target uploads, 0.0 shrinks, 0.2 read-backs 0.0 late | 0 shaders 0 psos this second
+[    2.001] perf: 120.0 fps 8.33 ms/frame | host 2.50 (draw 1.00: assemble 0.50 bind 0.25 [check 0.10, upload 0.05] compile 0.00; clear 0.10 copy 0.10 sync 0.20 present 1.00 [swap 0.80 wait 0.10]) other 5.83
+[    2.001] perf: title thread per frame: recording 1.50 ms, waiting 3.00 ms (1.5 waits: read-back 0.10 resource 0.00 fence 0.10 flush 0.00 copy 0.00, next frame 2.80) | read-backs waited for: 0.2 lock, 0.0 NOOVERWRITE
+[    2.001] perf: per frame 100 draws (100 raw) 25k verts 0.5 MB upload 0.0 overflow | 100 checks 0.10 MB hashed | 0.1 tex uploads 0.05 MB, 0.0 new tex, 0.0 new targets, 0.0 target uploads, 0.0 shrinks, 0.2 read-backs 0.0 late | 0 shaders 0 psos this second

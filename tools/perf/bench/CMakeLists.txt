@@ -1,0 +1,20 @@
+# Google Benchmark over the runtime's hot paths. The test only checks they run: timings on a CI machine compare to nothing.
+# Numbers for a real comparison: run perf_bench itself, built Release, on a quiet machine.
+set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
+set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
+FetchContent_Declare(benchmark GIT_REPOSITORY https://github.com/google/benchmark.git GIT_TAG v1.9.1 GIT_SHALLOW TRUE)
+FetchContent_MakeAvailable(benchmark)
+
+set(RT ${XBE_SDK_DIR}/runtime)
+add_executable(perf_bench ${CMAKE_CURRENT_SOURCE_DIR}/bench_main.cpp)
+add_dependencies(perf_bench runtime_test_symbols)
+target_link_libraries(perf_bench PRIVATE runtime_under_test benchmark::benchmark)
+target_include_directories(perf_bench PRIVATE ${CMAKE_BINARY_DIR}/runtime/symbols)
+if(WIN32)
+    target_link_libraries(perf_bench PRIVATE ws2_32 shlwapi)
+    target_link_options(perf_bench PRIVATE -fuse-ld=lld)
+else()
+    target_link_libraries(perf_bench PRIVATE pthread)
+endif()
+add_test(NAME perf_bench_runs COMMAND perf_bench --benchmark_min_time=0.001s)

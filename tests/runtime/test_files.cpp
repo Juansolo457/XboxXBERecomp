@@ -12,7 +12,7 @@ namespace fs = std::filesystem;
 
 namespace {
 
-constexpr uint32_t kNtClose = 187, kNtCreateFile = 190, kNtOpenFile = 202, kNtQueryDirectoryFile = 207,
+constexpr uint32_t kNtOpenFile = 202, kNtQueryDirectoryFile = 207,
                    kNtSetInformationFile = 226;
 constexpr uint32_t kDirectoryOption = 1;
 constexpr uint32_t kFileDirectoryInformation = 1;
@@ -83,7 +83,7 @@ struct Call : test::GuestStack {
             for (char& c : n) c = char(std::tolower(uint8_t(c)));
             names.push_back(n);
         }
-        test::KernelCall(ctx, kNtClose, {dir});
+        kernel::CloseHandle(dir);
         std::sort(names.begin(), names.end());
         return names;
     }
@@ -125,11 +125,11 @@ TEST_CASE("the end of a listing and a restart") {
     CHECK(c.Next(dir, mask) == kernel::kNoMoreFiles);
     CHECK(c.Next(dir, mask, 1) == kernel::kSuccess);  // RestartScan
     CHECK(c.Name() == "ABC.TXT");
-    test::KernelCall(c.ctx, kNtClose, {dir});
+    kernel::CloseHandle(dir);
 
     dir = c.Open("\\??\\D:\\", kDirectoryOption);
     CHECK(c.Next(dir, AnsiString("nothing*")) == kernel::kNoSuchFile);
-    test::KernelCall(c.ctx, kNtClose, {dir});
+    kernel::CloseHandle(dir);
 }
 
 TEST_CASE("an entry carries its name length and directory flag") {
@@ -140,7 +140,7 @@ TEST_CASE("an entry carries its name length and directory flag") {
     CHECK(kernel::R32(c.out + 0x3C) == 3);
     CHECK((kernel::R32(c.out + 0x38) & 0x10) != 0);  // FILE_ATTRIBUTE_DIRECTORY
     CHECK(kernel::R32(c.iosb + 4) == 0x43);          // bytes written, in the IO status block
-    test::KernelCall(c.ctx, kNtClose, {dir});
+    kernel::CloseHandle(dir);
 }
 
 TEST_CASE("a bad handle is refused") {
@@ -163,7 +163,7 @@ uint32_t Rename(Call& c, const std::string& from, const std::string& to, uint8_t
     kernel::W32(in + 12, text);
     std::memcpy(kernel::HostPtr(text), target.data(), target.size());
     uint32_t r = test::KernelCall(c.ctx, kNtSetInformationFile, {file, c.iosb, in, 16, kFileRenameInformation});
-    test::KernelCall(c.ctx, kNtClose, {file});
+    kernel::CloseHandle(file);
     return r;
 }
 
