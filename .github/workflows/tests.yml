@@ -1,0 +1,47 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  ctest:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find Visual Studio's Clang, CMake and Ninja
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -property installationPath
+          "$vs\VC\Tools\Llvm\x64\bin" >> $env:GITHUB_PATH
+          "$vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin" >> $env:GITHUB_PATH
+          "$vs\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja" >> $env:GITHUB_PATH
+
+      - name: Install Clang and Ninja
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y clang ninja-build
+
+      - name: Configure
+        run: cmake -S tests -B out/tests -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+
+      - name: Build
+        run: cmake --build out/tests
+
+      - name: Test
+        run: ctest --test-dir out/tests --output-on-failure --timeout 300
+
+      # what a golden file is compared against, to read when one differs
+      - name: Keep the generated code
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-${{ matrix.os }}
+          path: out/tests/recomp/*/generated/
+          if-no-files-found: ignore
