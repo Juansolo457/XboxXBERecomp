@@ -1,0 +1,15 @@
+# A benchmark scene: where a run starts and how long it counts. Copy to scenes/<game>/<scene>.toml in the game's repo.
+name = "attract"
+description = "the title's attract loop, untouched"
+# the pad's lines, the harness's SCRIPT format (harness/README.md): frame buttons [frames held]
+pad_script = """
+# frame buttons [held]
+300 START
+"""
+# XBE_PERF samples from the second this frame presents, for this many frames
+start_frame = 600
+frames = 3600
+# how the run is made comparable
+vsync = false
+fps_cap = 0
+resolution = [1920, 1080]

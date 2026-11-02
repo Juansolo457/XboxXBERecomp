@@ -1,0 +1,27 @@
+[    0.012] [info] [t1a2b] Sample Title (default.xbe), 2026-11-01 12:00:00
+[    0.012] [info] [t1a2b] Path: C:\sample
+[    0.012] [info] [t1a2b] OS: Windows 10.0 build 26100
+[    0.013] [info] [t1a2b] CPU: Test CPU 4000 (16 threads)
+[    0.013] [info] [t1a2b] RAM: 32.0 GB
+[    0.013] [info] [t1a2b] GPU 1: Test GPU 100 (primary)
+[    0.013] [info] [t1a2b] GPU 2: Other GPU
+[    0.014] [info] [t1a2b] Desktop: 1920x1080
+[    0.100] [info] [t3c4d] D3D12 adapter: Test GPU 100
+[    0.200] [info] [t1a2b] memory: guest space at 0x100000000
+[    1.001] [info] [t3c4d] perf: 60.0 fps 16.67 ms/frame | host 6.50 (draw 4.00: assemble 1.50 bind 1.25 [check 0.50, upload 0.25] compile 0.10; clear 0.20 copy 0.30 sync 0.50 present 1.50 [swap 1.00 wait 0.25]) other 10.17
+[    1.001] [info] [t3c4d] perf: title thread per frame: recording 3.00 ms, waiting 8.00 ms (2.5 waits: read-back 0.50 resource 0.10 fence 0.20 flush 0.05 copy 0.05, next frame 7.10) | read-backs waited for: 1.0 lock, 0.5 NOOVERWRITE
+[    1.001] [info] [t3c4d] perf: per frame 412 draws (400 raw) 125k verts 3.5 MB upload 0.0 overflow | 412 checks 1.25 MB hashed | 2.5 tex uploads 0.75 MB, 0.5 new tex, 0.0 new targets, 0.5 target uploads, 0.0 shrinks, 1.5 read-backs 0.1 late | 3 shaders 2 psos this second
+[    2.001] [info] [t3c4d] perf: 60.0 fps 16.67 ms/frame | host 6.50 (draw 4.00: assemble 1.50 bind 1.25 [check 0.50, upload 0.25] compile 0.10; clear 0.20 copy 0.30 sync 0.50 present 1.50 [swap 1.00 wait 0.25]) other 10.17
+[    2.001] [info] [t3c4d] perf: title thread per frame: recording 3.00 ms, waiting 8.00 ms (2.5 waits: read-back 0.50 resource 0.10 fence 0.20 flush 0.05 copy 0.05, next frame 7.10) | read-backs waited for: 1.0 lock, 0.5 NOOVERWRITE
+[    2.001] [info] [t3c4d] perf: per frame 412 draws (400 raw) 125k verts 3.5 MB upload 0.0 overflow | 412 checks 1.25 MB hashed | 2.5 tex uploads 0.75 MB, 0.5 new tex, 0.0 new targets, 0.5 target uploads, 0.0 shrinks, 1.5 read-backs 0.1 late | 0 shaders 2 psos this second
+[    2.500] [warn] [t1a2b] an unrelated line between the seconds
+[    3.001] [info] [t3c4d] perf: 60.0 fps 16.67 ms/frame | host 6.50 (draw 4.00: assemble 1.50 bind 1.25 [check 0.50, upload 0.25] compile 0.10; clear 0.20 copy 0.30 sync 0.50 present 1.50 [swap 1.00 wait 0.25]) other 10.17
+[    3.001] [info] [t3c4d] perf: title thread per frame: recording 3.00 ms, waiting 8.00 ms (2.5 waits: read-back 0.50 resource 0.10 fence 0.20 flush 0.05 copy 0.05, next frame 7.10) | read-backs waited for: 1.0 lock, 0.5 NOOVERWRITE
+[    3.001] [info] [t3c4d] perf: per frame 412 draws (400 raw) 125k verts 3.5 MB upload 0.0 overflow | 412 checks 1.25 MB hashed | 2.5 tex uploads 0.75 MB, 0.5 new tex, 0.0 new targets, 0.5 target uploads, 0.0 shrinks, 1.5 read-backs 0.1 late | 0 shaders 2 psos this second
+[    4.001] [info] [t3c4d] perf: 30.0 fps 33.33 ms/frame | host 20.00 (draw 15.00: assemble 5.00 bind 4.00 [check 1.50, upload 1.00] compile 2.00; clear 0.50 copy 0.50 sync 2.00 present 2.00 [swap 1.50 wait 0.50]) other 13.33
+[    4.001] [info] [t3c4d] perf: title thread per frame: recording 9.00 ms, waiting 20.00 ms (6.0 waits: read-back 5.00 resource 1.00 fence 1.00 flush 0.50 copy 0.50, next frame 12.00) | read-backs waited for: 4.0 lock, 2.0 NOOVERWRITE
+[    4.001] [info] [t3c4d] perf: per frame 1250 draws (1200 raw) 480k verts 12.0 MB upload 0.5 overflow | 1250 checks 8.50 MB hashed | 12.0 tex uploads 6.50 MB, 4.0 new tex, 2.0 new targets, 2.0 target uploads, 1.0 shrinks, 6.0 read-backs 1.5 late | 40 shaders 25 psos this second
+[    5.001] [info] [t3c4d] perf: 60.0 fps 16.67 ms/frame | host 6.50 (draw 4.00: assemble 1.50 bind 1.25 [check 0.50, upload 0.25] compile 0.10; clear 0.20 copy 0.30 sync 0.50 present 1.50 [swap 1.00 wait 0.25]) other 10.17
+[    5.001] [info] [t3c4d] perf: title thread per frame: recording 3.00 ms, waiting 8.00 ms (2.5 waits: read-back 0.50 resource 0.10 fence 0.20 flush 0.05 copy 0.05, next frame 7.10) | read-backs waited for: 1.0 lock, 0.5 NOOVERWRITE
+[    5.001] [info] [t3c4d] perf: per frame 412 draws (400 raw) 125k verts 3.5 MB upload 0.0 overflow | 412 checks 1.25 MB hashed | 2.5 tex uploads 0.75 MB, 0.5 new tex, 0.0 new targets, 0.5 target uploads, 0.0 shrinks, 1.5 read-backs 0.1 late | 0 shaders 2 psos this second
+[    5.500] [info] [t1a2b] Exit (0)

@@ -49,6 +49,10 @@ audio output and `kernel/boot.cpp`, on the real 4 GB guest address space:
 accepts a change. `shader_corpus_compile` puts every file through each compiler it finds: fxc at the renderer's profiles,
 dxc at shader model 6. The HLSL is checked to compile, not run. With neither compiler the test reports as skipped.
 
+## Performance tools
+
+`tools/perf/` has its own README. This build makes its microbenchmarks and runs the tools' tests.
+
 ## Known bugs
 
 A test marked `doctest::should_fail()` states the right behaviour of something the SDK gets wrong today. The suite stays
