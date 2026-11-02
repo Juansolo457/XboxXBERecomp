@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <cstdio>
+#include <cstdlib>
 #include <functional>
 #include <thread>
 
@@ -64,5 +65,9 @@ bool WaitUntilImpl(bool (*poll)(void*), void* arg) {
 int main(int argc, char** argv) {
     if (!mem::Init()) return 1;
     kernel::g_base = mem::Base();
-    return doctest::Context(argc, argv).run();
+    int result = doctest::Context(argc, argv).run();
+    test::RemoveMounts();
+    // the timer and DPC threads wait on static condition variables, whose destructors at exit would wait for them
+    std::fflush(nullptr);
+    std::_Exit(result);
 }

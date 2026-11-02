@@ -2,6 +2,7 @@
 #include <cctype>
 #include <filesystem>
 #include <fstream>
+#include <memory>
 #include <random>
 #include <string>
 #include <vector>
@@ -30,15 +31,13 @@ struct Mounts {
         for (const char* name : {"ABC.TXT", "abd.txt", "readme.md"}) std::ofstream(game / name) << "x";
         kernel::MountDefaults(game.string(), data.string());
     }
-    ~Mounts() {
-        std::error_code ec;
-        fs::remove_all(root, ec);
-    }
 };
 
+std::unique_ptr<Mounts> g_mounts;
+
 Mounts& GetMounts() {
-    static Mounts m;
-    return m;
+    if (!g_mounts) g_mounts = std::make_unique<Mounts>();
+    return *g_mounts;
 }
 
 // ANSI_STRING with its text, in guest memory
@@ -203,4 +202,10 @@ TEST_CASE("opening what does not exist") {
     uint32_t status = 0;
     c.Open("\\??\\D:\\no such file", 0, &status);
     CHECK(status != kernel::kSuccess);
+}
+
+void test::RemoveMounts() {
+    if (!g_mounts) return;
+    std::error_code ec;
+    fs::remove_all(g_mounts->root, ec);
 }

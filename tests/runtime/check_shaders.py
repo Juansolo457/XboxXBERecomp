@@ -67,7 +67,8 @@ def compile_all(out):
         if fxc:
             runs.append([fxc, "/nologo", "/T", f"{stage}_5_0", "/E", "main", "/O1", "/Fo", os.devnull, str(path)])
         if dxc:
-            runs.append([dxc, "-T", f"{stage}_6_0", "-E", "main", "-O1", "-Fo", str(path) + ".dxil", str(path)])
+            # the language version fxc takes: 2021 turned vector ?: and && into errors
+            runs.append([dxc, "-HV", "2018", "-T", f"{stage}_6_0", "-E", "main", "-O1", "-Fo", str(path) + ".dxil", str(path)])
         for run in runs:
             r = subprocess.run(run, capture_output=True, text=True)
             if r.returncode:

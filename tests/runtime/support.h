@@ -24,6 +24,9 @@ struct GuestStack {
 uint32_t KernelCall(X86Context& ctx, uint32_t ordinal, std::initializer_list<uint32_t> args);
 
 // spins until the condition holds, false after a few seconds
+// test_files.cpp's temporary folders, removed before the process ends
+void RemoveMounts();
+
 bool WaitUntilImpl(bool (*poll)(void*), void* arg);
 template <typename F>
 bool WaitUntil(F condition) {
